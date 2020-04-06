@@ -292,11 +292,7 @@ class CoyoteMigrate extends Command
                             'receives_email' => $user->subscribed,
                             'first_name' => $user->first_name,
                             'last_name' => $user->last_name,
-                            'address1' => $user->address1,
-                            'address2' => empty($user->address2) ? null : $user->address2,
-                            'city' => $user->city,
-                            'state' => $user->state,
-                            'zip' => $user->zip,
+                            'address' => $this->reformatAddress($user->address1, $user->address2, $user->city, $user->state, $user->zip),
                             'phone' => $user->phone,
                             'grad_year' => $user->grad_year,
                             'roll_number' => $user->roll_number,
@@ -310,5 +306,24 @@ class CoyoteMigrate extends Command
                     })->toArray()
             );
         });
+    }
+
+    protected function reformatAddress($street1, $street2, $city, $state, $zip)
+    {
+        $base = $street1;
+
+        if (strlen($street2) > 0)
+            $base .= " $street2";
+
+        if (strlen($city) > 0)
+            $base .= ", $city";
+
+        if (strlen($state) > 0)
+            $base .= ", $state";
+
+        if (strlen($zip) > 0)
+            $base .= " $zip";
+
+        return $base;
     }
 }
